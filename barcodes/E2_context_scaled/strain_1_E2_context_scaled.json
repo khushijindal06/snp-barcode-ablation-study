@@ -1,0 +1,42 @@
+{
+  "experiment_id": "E2",
+  "label": "SNP-context plus SNP-center scaling",
+  "purpose": "Tests whether visual emphasis of the variant position improves learning.",
+  "reference_fasta": "examples\\reference.fasta",
+  "vcf": "examples\\strain_1.snps.vcf",
+  "sample_used": "strain_1",
+  "backend_used": "simple",
+  "output_png": "barcodes\\E2_context_scaled\\strain_1_E2_context_scaled.png",
+  "height": 13,
+  "width": 3,
+  "flank": 5,
+  "snp_scale": 3,
+  "components": {
+    "snp_context_encoding": true,
+    "snp_center_scaling": true,
+    "gap_encoding": false,
+    "boundary_markers": false
+  },
+  "base_to_gray": {
+    "A": 255,
+    "C": 85,
+    "G": 170,
+    "T": 0,
+    "N": 128
+  },
+  "gap_color": 32,
+  "marker_color": 220,
+  "chromosome_gap_pixels": 5,
+  "stats": {
+    "records_seen": 5,
+    "snps_encoded": 3,
+    "skipped_no_alt": 0,
+    "skipped_non_snp": 1,
+    "skipped_bad_base": 0,
+    "skipped_sample_ref": 1,
+    "skipped_missing_chrom": 0,
+    "gaps_inserted": 0,
+    "gap_pixels_inserted": 0,
+    "chromosome_separators": 0
+  }
+}

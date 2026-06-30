@@ -1,0 +1,42 @@
+{
+  "experiment_id": "E3",
+  "label": "Full genomic barcode",
+  "purpose": "Tests the complete proposed representation with local context and global SNP spacing.",
+  "reference_fasta": "examples\\reference.fasta",
+  "vcf": "examples\\strain_1.snps.vcf",
+  "sample_used": "strain_1",
+  "backend_used": "simple",
+  "output_png": "barcodes\\E3_full_barcode\\strain_1_E3_full_barcode.png",
+  "height": 13,
+  "width": 11,
+  "flank": 5,
+  "snp_scale": 3,
+  "components": {
+    "snp_context_encoding": true,
+    "snp_center_scaling": true,
+    "gap_encoding": true,
+    "boundary_markers": true
+  },
+  "base_to_gray": {
+    "A": 255,
+    "C": 85,
+    "G": 170,
+    "T": 0,
+    "N": 128
+  },
+  "gap_color": 32,
+  "marker_color": 220,
+  "chromosome_gap_pixels": 5,
+  "stats": {
+    "records_seen": 5,
+    "snps_encoded": 3,
+    "skipped_no_alt": 0,
+    "skipped_non_snp": 1,
+    "skipped_bad_base": 0,
+    "skipped_sample_ref": 1,
+    "skipped_missing_chrom": 0,
+    "gaps_inserted": 2,
+    "gap_pixels_inserted": 6,
+    "chromosome_separators": 1
+  }
+}

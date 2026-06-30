@@ -1,0 +1,5 @@
+numpy>=1.23
+pillow>=10
+
+# Optional but recommended for large/indexed FASTA and VCF files:
+# pysam>=0.22

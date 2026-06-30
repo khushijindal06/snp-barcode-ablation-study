@@ -1,0 +1,4 @@
+Experiment,Input representation,SNP scaling,Gap encoding,Boundary markers,Output folder,Purpose
+E1,SNP-context grayscale barcode,No,No,No,E1_context_only,Tests local nucleotide context around SNPs
+E2,SNP-context grayscale barcode with center scaling,Yes,No,No,E2_context_scaled,Tests effect of SNP-position emphasis
+E3,Full genomic barcode,Yes,Yes,Yes,E3_full_barcode,Tests complete proposed representation with local context and global SNP spacing
