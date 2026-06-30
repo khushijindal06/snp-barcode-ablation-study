@@ -7,6 +7,7 @@
   "sample_used": "strain_1",
   "backend_used": "simple",
   "output_png": "barcodes\\E1_context_only\\strain_1_E1_context_only.png",
+  "encoded_snps_csv": "barcodes\\E1_context_only\\strain_1_E1_context_only_encoded_snps.csv",
   "height": 11,
   "width": 3,
   "flank": 5,
@@ -27,6 +28,12 @@
   "gap_color": 32,
   "marker_color": 220,
   "chromosome_gap_pixels": 5,
+  "filters": {
+    "require_pass_filter": true,
+    "allow_unfiltered_filter": false,
+    "min_qual": null,
+    "check_ref_match": true
+  },
   "stats": {
     "records_seen": 5,
     "snps_encoded": 3,
@@ -35,6 +42,9 @@
     "skipped_bad_base": 0,
     "skipped_sample_ref": 1,
     "skipped_missing_chrom": 0,
+    "skipped_filter": 0,
+    "skipped_low_qual": 0,
+    "skipped_ref_mismatch": 0,
     "gaps_inserted": 0,
     "gap_pixels_inserted": 0,
     "chromosome_separators": 0

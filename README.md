@@ -37,18 +37,21 @@ context, SNP-position emphasis, and genomic distance information.
 Implemented:
 
 - E1, E2, and E3 barcode generation.
+- Batch barcode generation from a dataset manifest.
 - FASTA and VCF parsing with a small-file backend.
 - Optional `pysam` backend for larger indexed genome files.
 - Genotype-aware ALT allele selection from VCF samples.
+- PASS/QUAL filtering and REF allele validation.
+- Encoded SNP coordinate maps for explainability.
+- CNN training and testing on E1, E2, and E3 barcode datasets.
+- Traditional SNP-vector ML baselines.
+- Occlusion sensitivity for CNN explainability.
 - Example reference FASTA and SNP VCF.
 - Example generated barcode PNGs and JSON metadata.
 - Experiment design matrix.
 
 Not implemented yet:
 
-- CNN training scripts.
-- Traditional ML baseline scripts.
-- Explainability scripts such as Grad-CAM or occlusion sensitivity.
 - Real biological dataset and labels.
 - Final result tables for a paper or thesis.
 
@@ -65,9 +68,16 @@ snp_barcode_ablation_study/
 |-- experiment_matrix.csv
 |-- examples/
 |   |-- reference.fasta
+|   |-- labels.csv
 |   `-- strain_1.snps.vcf
 |-- scripts/
-|   `-- generate_ablation_barcodes.py
+|   |-- generate_ablation_barcodes.py
+|   |-- generate_dataset_from_manifest.py
+|   |-- train_cnn.py
+|   |-- train_ml_baselines.py
+|   `-- occlusion_sensitivity.py
+|-- tests/
+|   `-- test_gap_pixels.py
 `-- barcodes/
     |-- E1_context_only/
     |-- E2_context_scaled/
@@ -110,11 +120,11 @@ backend.
 For a real experiment, prepare one dataset manifest with one row per strain or
 sample:
 
-| sample_id | strain_name | reference | vcf_path | label |
-| --- | --- | --- | --- | --- |
-| S1 | strain_1 | reference.fasta | strain_1.snps.vcf.gz | Resistant |
-| S2 | strain_2 | reference.fasta | strain_2.snps.vcf.gz | Susceptible |
-| S3 | strain_3 | reference.fasta | strain_3.snps.vcf.gz | Resistant |
+| sample_id | strain_name | reference | vcf_path | label | sample_name |
+| --- | --- | --- | --- | --- | --- |
+| S1 | strain_1 | reference.fasta | strain_1.snps.vcf.gz | Resistant | strain_1 |
+| S2 | strain_2 | reference.fasta | strain_2.snps.vcf.gz | Susceptible | strain_2 |
+| S3 | strain_3 | reference.fasta | strain_3.snps.vcf.gz | Resistant | strain_3 |
 
 The `label` column depends on the biological task:
 
@@ -217,6 +227,43 @@ Each image has a matching JSON file that records:
 - barcode components used
 - grayscale mapping
 
+Each image also has an encoded SNP map:
+
+```text
+*_encoded_snps.csv
+```
+
+This file links barcode columns back to chromosome, position, REF, ALT,
+gap-before pixels, and SNP-center rows.
+
+## Generate A Full Barcode Dataset
+
+Use a manifest to generate E1, E2, and E3 barcodes for every strain:
+
+```bash
+python scripts/generate_dataset_from_manifest.py \
+  --manifest labels.csv \
+  --output-root barcodes \
+  --dataset-index dataset_index.csv \
+  --flank 50 \
+  --scaled-snp-scale 10 \
+  --min-qual 30
+```
+
+The manifest must contain:
+
+```csv
+sample_id,label,vcf_path
+```
+
+Recommended full manifest:
+
+```csv
+sample_id,strain_name,reference,vcf_path,label,sample_name
+```
+
+The output `dataset_index.csv` is the input for CNN training.
+
 ## Encoding Rules
 
 Base-to-grayscale mapping:
@@ -270,6 +317,18 @@ Run the included boundary test for gap encoding:
 python -m unittest discover -s tests
 ```
 
+Run the barcode-generation smoke example:
+
+```bash
+python scripts/generate_dataset_from_manifest.py \
+  --manifest examples/labels.csv \
+  --output-root barcodes \
+  --dataset-index dataset_index.csv \
+  --flank 5 \
+  --scaled-snp-scale 3 \
+  --backend simple
+```
+
 ## Experimental Design
 
 Train the same CNN architecture separately on E1, E2, and E3:
@@ -307,6 +366,33 @@ Option B: use adaptive pooling so the CNN can accept variable image dimensions.
 
 Use the same strategy for E1, E2, and E3.
 
+## Train And Test CNN Models
+
+After generating `dataset_index.csv`, train all three CNN models:
+
+```bash
+python scripts/train_cnn.py \
+  --dataset-index dataset_index.csv \
+  --output-dir results/cnn \
+  --variants all \
+  --image-size 224 \
+  --epochs 30 \
+  --batch-size 16 \
+  --seed 42
+```
+
+Outputs:
+
+```text
+results/cnn/splits.csv
+results/cnn/summary_metrics.csv
+results/cnn/E1/model.pt
+results/cnn/E2/model.pt
+results/cnn/E3/model.pt
+results/cnn/*/predictions.csv
+results/cnn/*/metrics.json
+```
+
 ## Recommended Baselines
 
 To make the study stronger, compare barcode CNNs with traditional SNP-vector
@@ -323,6 +409,24 @@ machine learning baselines:
 
 This comparison tests whether the image representation adds value beyond
 standard tabular SNP features.
+
+Run the baseline models:
+
+```bash
+python scripts/train_ml_baselines.py \
+  --manifest labels.csv \
+  --output-dir results/ml_baselines \
+  --min-qual 30 \
+  --seed 42
+```
+
+Outputs:
+
+```text
+results/ml_baselines/summary_metrics.csv
+results/ml_baselines/predictions.csv
+results/ml_baselines/*.joblib
+```
 
 ## Explainability Plan
 
@@ -342,6 +446,16 @@ Recommended thesis wording:
 Explainability analysis was performed to identify whether the CNN focused on
 SNP-context regions, scaled SNP rows, or inter-SNP gap patterns during
 classification.
+```
+
+Run occlusion sensitivity for one trained CNN and one barcode image:
+
+```bash
+python scripts/occlusion_sensitivity.py \
+  --checkpoint results/cnn/E3/model.pt \
+  --image barcodes/E3_full_barcode/strain_1_E3_full_barcode.png \
+  --output-csv results/explainability/strain_1_E3_occlusion.csv \
+  --output-heatmap results/explainability/strain_1_E3_occlusion.png
 ```
 
 ## Results To Report

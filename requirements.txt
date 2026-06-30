@@ -1,5 +1,11 @@
 numpy>=1.23
 pillow>=10
+scikit-learn>=1.3
+joblib>=1.3
+torch>=2.0
 
 # Optional but recommended for large/indexed FASTA and VCF files:
 # pysam>=0.22
+
+# Optional ML baseline:
+# xgboost>=2.0

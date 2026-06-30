@@ -1,0 +1,2 @@
+sample_id,strain_name,reference,vcf_path,label,sample_name
+strain_1,strain_1,reference.fasta,strain_1.snps.vcf,Resistant,strain_1

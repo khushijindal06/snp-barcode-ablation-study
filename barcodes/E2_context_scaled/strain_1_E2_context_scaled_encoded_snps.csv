@@ -1,0 +1,4 @@
+barcode_column,chrom,pos,ref,reference_base,alt,qual,filter,gap_before,center_row_start,center_row_end,context_start,context_end
+0,chr1,2,C,C,G,60.0,PASS,0,5,7,1,7
+1,chr1,20,T,T,A,60.0,PASS,0,5,7,15,25
+2,chr2,3,C,C,A,60.0,PASS,0,5,7,1,8
