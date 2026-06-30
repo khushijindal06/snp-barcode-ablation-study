@@ -345,9 +345,19 @@ def fetch_context(ref_reader, chrom: str, pos: int, flank: int) -> str:
 
 
 def gap_pixels(distance: int) -> int:
+    """Convert inter-SNP distance into non-overlapping log-scaled gap pixels.
+
+    The bins match the Objective 1 presentation:
+      0 px = 0-10 bp
+      1 px = 11-100 bp
+      2 px = 101-1,000 bp
+      3 px = 1,001-10,000 bp
+      4 px = 10,001-100,000 bp
+      and so on.
+    """
     if distance <= 10:
         return 0
-    return int(math.floor(math.log10(distance)))
+    return int(math.floor(math.log10(distance - 1)))
 
 
 def encode_column(context: str, alt_base: str, flank: int, snp_scale: int) -> np.ndarray:

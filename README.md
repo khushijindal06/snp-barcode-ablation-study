@@ -236,6 +236,17 @@ gap columns      = 32
 boundary markers = 220
 ```
 
+Inter-SNP genomic gaps follow the non-overlapping bins used in the Objective 1
+presentation:
+
+```text
+0 px = 0-10 bp
+1 px = 11-100 bp
+2 px = 101-1,000 bp
+3 px = 1,001-10,000 bp
+4 px = 10,001-100,000 bp
+```
+
 For E1, image height is:
 
 ```text
@@ -250,6 +261,14 @@ flank + scaled_snp_scale + flank
 
 With `flank = 50` and `scaled_snp_scale = 10`, E1 height is 101 pixels and
 E2/E3 height is 110 pixels.
+
+## Verification
+
+Run the included boundary test for gap encoding:
+
+```bash
+python -m unittest discover -s tests
+```
 
 ## Experimental Design
 
